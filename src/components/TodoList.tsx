@@ -1,5 +1,7 @@
 import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
 import {TaskTypeProps} from "../App";
+import {AddItemForm} from "./AddItemForm";
+import {EditableSpan} from "./EditableSpan";
 
 
 export type TasksType = {
@@ -8,16 +10,15 @@ export type TasksType = {
     title: string
     filter: FilterType
     deleteTaskApp: (idTodo: string, idTask: string) => void
+    updateTitleTaskApp: (idTodo: string, idTask: string, title: string) => void
     addTaskApp: (idTodo: string, newTitle: string) => void
     changeStatusTask: (idTodo: string, idTask: string, check: boolean) => void
     changeFilterTodo: (idTodo: string, filter: FilterType) => void
+    updateTitleTodo: (idTodo: string, title: string) => void
     removeTodo: (idTodo: string) => void
 }
 export type FilterType = 'All' | 'Active' | 'Completed'
 export const TodoList = (props: TasksType) => {
-
-    const [titleInput, setTitleInput] = useState<string>('')
-    const [error, setError] = useState<string | null>(null)
 
     let filteredTasks = props.tasks
 
@@ -26,51 +27,35 @@ export const TodoList = (props: TasksType) => {
 
     const statusTasks = (filter: FilterType) => {
         props.changeFilterTodo(props.idTodo, filter)
-        //setFilter(props.filter)
     }
     const deleteTask = (taskId: string) => {
         props.deleteTaskApp(props.idTodo, taskId)
     }
-    const onChangeTitle = (e: ChangeEvent<HTMLInputElement>) => {
-        setTitleInput(e.currentTarget.value)
-    }
-    const addTask = () => {
-        if (titleInput !== '') {
-            props.addTaskApp(props.idTodo, titleInput.trim())
-            setTitleInput('')
-        } else {
-            setError('The title is required')
-        }
-
-
-    }
-    const enterPress = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            addTask()
-        }
-        setError(null)
-    }
     const deleteTodo = () => {
         props.removeTodo(props.idTodo)
     }
+    const addItemForm = (newTitle: string) => {
+        props.addTaskApp(props.idTodo, newTitle)
+    }
+    const updateTitleSpan = (newTitle: string) => {
+        props.updateTitleTodo(props.idTodo, newTitle)
+    }
+
     return (
         <div>
-            <h3>{props.title}
-                <button onClick={deleteTodo}>x</button>
-            </h3>
-            <div>
-                <input
-                    style={{border: error ? 'solid 1px red' : ''}}
-                    value={titleInput}
-                    onChange={onChangeTitle}
-                    onKeyUp={enterPress}
+            <button onClick={deleteTodo}>x</button>
+            <h3>
+                <EditableSpan
+                    title={props.title}
+                    updateTitleSpan={updateTitleSpan}
                 />
-                <button onClick={addTask}>+</button>
-                {error && <div style={{color: 'red'}}>{error}</div>}
-            </div>
+            </h3>
+            <AddItemForm addTaskApp={addItemForm}/>
             <ul>
                 {filteredTasks.map(el => {
-
+                    const updateTitleTask = (newTitle: string) => {
+                        props.updateTitleTaskApp(props.idTodo, el.id, newTitle)
+                    }
                     return (
                         <li key={el.id} style={{opacity: el.isDone ? '0.4' : ''}}>
                             <button onClick={(event) => deleteTask(el.id)}>x</button>
@@ -79,7 +64,7 @@ export const TodoList = (props: TasksType) => {
                                 checked={el.isDone}
                                 onChange={(event) => props.changeStatusTask(props.idTodo, el.id, event.currentTarget.checked)}
                             />
-                            <span>{el.title}</span>
+                            <EditableSpan title={el.title} updateTitleSpan={updateTitleTask}/>
                         </li>
                     )
                 })}
