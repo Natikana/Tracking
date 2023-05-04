@@ -1,0 +1,12 @@
+.App {
+    display: flex;
+    flex-direction: column;
+}
+
+.AppWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: stretch;
+    padding: 50px;
+    gap: 70px;
+}

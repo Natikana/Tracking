@@ -1,9 +1,18 @@
 import React, {ChangeEvent, KeyboardEvent, useState} from "react";
+import Button from "@mui/material/Button";
+import {styleBtn} from "./todoList/TodoList";
+import TextField from '@mui/material/TextField';
 
 export type AddItemFormType = {
     addTaskApp: (newTitle: string) => void
 }
-export const AddItemForm = (props:AddItemFormType) => {
+export const styleTextField = {
+    padding: '0',
+    maxHeight: '38px',
+    minHeight: '38px',
+}
+
+export const AddItemForm = (props: AddItemFormType) => {
     const [error, setError] = useState<string | null>(null)
     const [titleInput, setTitleInput] = useState<string>('')
 
@@ -24,16 +33,19 @@ export const AddItemForm = (props:AddItemFormType) => {
         }
         setError(null)
     }
-  return (
-      <div>
-          <input
-              style={{border: error ? 'solid 1px red' : ''}}
-              value={titleInput}
-              onChange={onChangeTitle}
-              onKeyUp={enterPress}
-          />
-          <button onClick={addTask}>+</button>
-          {error && <div style={{color: 'red'}}>{error}</div>}
-      </div>
-  )
+    return (
+        <div>
+            <TextField
+                size={'small'}
+                style={styleTextField}
+                id="outlined-multiline-flexible"
+                label={error ? error :'Please type here...'}
+                value={titleInput}
+                onChange={onChangeTitle}
+                onKeyUp={enterPress}
+                error={!!error ? !!error : !!null}
+            />
+            <Button onClick={addTask} size="small" variant="contained" style={styleBtn}>+</Button>
+        </div>
+    )
 }

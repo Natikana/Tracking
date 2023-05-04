@@ -1,8 +1,10 @@
 import React, {useState} from 'react';
-import './App.css';
-import {FilterType, TodoList} from "./components/TodoList";
+import './App.module';
+import {FilterType, TodoList} from "./components/todoList/TodoList";
 import {v1} from "uuid";
 import {AddItemForm} from "./components/AddItemForm";
+import {AppStyled} from "./components/AppStyled";
+import cl from "./App.module.css"
 
 export type TaskTypeProps = {
     id: string
@@ -47,11 +49,9 @@ function App() {
     const addTaskApp = (idTodo: string, newTitle: string) => {
         let newTask = {id: v1(), title: newTitle, isDone: false}
         setTasks({...tasks, [idTodo]: [newTask, ...tasks[idTodo]]})
-        //setTasks([newTask, ...tasks])
     }
     const changeStatusTask = (idTodo: string, idTask: string, check: boolean) => {
         setTasks({...tasks, [idTodo]: tasks[idTodo].map(el => el.id === idTask ? {...el, isDone: check} : el)})
-        //setTasks(tasks.map(el => el.id === idTask ? {...el, isDone: check} : el))
     }
     const changeFilterTodo = (idTodo: string, filter: FilterType) => {
         setTodoLists(todoLists.map(el => el.id === idTodo ? {...el, filter} : el))
@@ -71,26 +71,27 @@ function App() {
         setTasks({...tasks, [idTodo]: tasks[idTodo].map(el => el.id === idTask ? {...el, title} : el)})
     }
     return (
-        <div className="App">
-            <AddItemForm addTaskApp={addTodo}/>
-            {todoLists.map(el => {
-                return (
-                    <TodoList
-                        changeFilterTodo={changeFilterTodo}
-                        key={el.id}
-                        idTodo={el.id}
-                        title={el.title}
-                        filter={el.filter}
-                        tasks={tasks[el.id]}
-                        deleteTaskApp={deleteTaskApp}
-                        addTaskApp={addTaskApp}
-                        changeStatusTask={changeStatusTask}
-                        removeTodo={removeTodoApp}
-                        updateTitleTodo={updateTitleTodoApp}
-                        updateTitleTaskApp={updateTitleTaskApp}
-                    />
-                )
-            })}
+        <div className={cl.App}>
+            <AppStyled/>
+            <div className={cl.AppWrapper}><AddItemForm addTaskApp={addTodo}/>
+                {todoLists.map(el => {
+                    return (
+                        <TodoList
+                            changeFilterTodo={changeFilterTodo}
+                            key={el.id}
+                            idTodo={el.id}
+                            title={el.title}
+                            filter={el.filter}
+                            tasks={tasks[el.id]}
+                            deleteTaskApp={deleteTaskApp}
+                            addTaskApp={addTaskApp}
+                            changeStatusTask={changeStatusTask}
+                            removeTodo={removeTodoApp}
+                            updateTitleTodo={updateTitleTodoApp}
+                            updateTitleTaskApp={updateTitleTaskApp}
+                        />
+                    )
+                })}</div>
         </div>
     );
 }

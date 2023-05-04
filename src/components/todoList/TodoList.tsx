@@ -1,7 +1,12 @@
-import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
-import {TaskTypeProps} from "../App";
-import {AddItemForm} from "./AddItemForm";
-import {EditableSpan} from "./EditableSpan";
+import React from 'react';
+import {TaskTypeProps} from "../../App";
+import {AddItemForm} from "../AddItemForm";
+import {EditableSpan} from "../EditableSpan";
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import cl from './TodoList.module.css'
 
 
 export type TasksType = {
@@ -18,6 +23,13 @@ export type TasksType = {
     removeTodo: (idTodo: string) => void
 }
 export type FilterType = 'All' | 'Active' | 'Completed'
+export const styleBtn = {
+    maxWidth: '38px',
+    maxHeight: '38px',
+    minWidth: '38px',
+    minHeight: '38px',
+}
+
 export const TodoList = (props: TasksType) => {
 
     let filteredTasks = props.tasks
@@ -42,13 +54,15 @@ export const TodoList = (props: TasksType) => {
     }
 
     return (
-        <div>
-            <button onClick={deleteTodo}>x</button>
+        <div className={cl.todoItem}>
             <h3>
                 <EditableSpan
                     title={props.title}
                     updateTitleSpan={updateTitleSpan}
                 />
+                <IconButton aria-label="delete" onClick={deleteTodo}>
+                    <DeleteIcon/>
+                </IconButton>
             </h3>
             <AddItemForm addTaskApp={addItemForm}/>
             <ul>
@@ -58,27 +72,26 @@ export const TodoList = (props: TasksType) => {
                     }
                     return (
                         <li key={el.id} style={{opacity: el.isDone ? '0.4' : ''}}>
-                            <button onClick={(event) => deleteTask(el.id)}>x</button>
-                            <input
-                                type="checkbox"
+                            <IconButton aria-label="delete" onClick={(event) => deleteTask(el.id)}>
+                                <DeleteIcon/>
+                            </IconButton>
+                            <Checkbox
                                 checked={el.isDone}
                                 onChange={(event) => props.changeStatusTask(props.idTodo, el.id, event.currentTarget.checked)}
                             />
+
                             <EditableSpan title={el.title} updateTitleSpan={updateTitleTask}/>
                         </li>
                     )
                 })}
             </ul>
             <div>
-                <button style={{backgroundColor: props.filter === 'All' ? 'yellow' : ''}}
-                        onClick={() => statusTasks('All')}>All
-                </button>
-                <button style={{backgroundColor: props.filter === 'Active' ? 'yellow' : ''}}
-                        onClick={() => statusTasks('Active')}>Active
-                </button>
-                <button style={{backgroundColor: props.filter === 'Completed' ? 'yellow' : ''}}
-                        onClick={() => statusTasks('Completed')}>Completed
-                </button>
+                <Button size={'small'} variant={props.filter === 'All' ? 'contained' : 'outlined'}
+                        onClick={() => statusTasks('All')}>All</Button>
+                <Button size={'small'} variant={props.filter === 'Active' ? 'contained' : 'outlined'}
+                        onClick={() => statusTasks('Active')}>Active</Button>
+                <Button size={'small'} variant={props.filter === 'Completed' ? 'contained' : 'outlined'}
+                        onClick={() => statusTasks('Completed')}>Completed</Button>
             </div>
         </div>
     )
