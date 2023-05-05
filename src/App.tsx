@@ -1,10 +1,26 @@
-import React, {useState} from 'react';
+import React, {Reducer, useReducer} from 'react';
 import './App.module';
 import {FilterType, TodoList} from "./components/todoList/TodoList";
 import {v1} from "uuid";
 import {AddItemForm} from "./components/AddItemForm";
 import {AppStyled} from "./components/AppStyled";
 import cl from "./App.module.css"
+import {
+    ActionsTasksType,
+    addTaskAC,
+    changeTaskStatusAC,
+    deleteTaskAC,
+    tasksReducer,
+    updateTaskTitleAC
+} from "./reducers/tasksReducer";
+import {
+    ActionsTodoType,
+    addTodoListAC,
+    changeFilterTodoListAC,
+    removeTodoListAC,
+    todoListReducer,
+    updateTitleTodoListAC
+} from "./reducers/todoListReducer";
 
 export type TaskTypeProps = {
     id: string
@@ -25,12 +41,13 @@ function App() {
     let todoListID1 = v1()
     let todoListID2 = v1()
 
-    const [todoLists, setTodoLists] = useState<Array<TodoListsType>>([
-        {id: todoListID1, title: 'What to learn', filter: 'All'},
-        {id: todoListID2, title: 'What to buy', filter: 'All'},
+    const [todoLists, dispatchTodoLists] = useReducer<Reducer<TodoListsType[], ActionsTodoType>>(todoListReducer, [
+        {id: todoListID1, title: 'What to learn', filter: FilterType.all},
+        {id: todoListID2, title: 'What to buy', filter: FilterType.all},
     ])
 
-    const [tasks, setTasks] = useState<TasksType>({
+
+    const [tasks, dispatchTasks] = useReducer<Reducer<TasksType, ActionsTasksType>>(tasksReducer, {
         [todoListID1]: [
             {id: v1(), title: 'HTML&CSS', isDone: true},
             {id: v1(), title: 'JS', isDone: true},
@@ -44,31 +61,34 @@ function App() {
     })
 
     const deleteTaskApp = (idTodo: string, idTask: string) => {
-        setTasks({...tasks, [idTodo]: tasks[idTodo].filter(el => el.id !== idTask)})
+        dispatchTasks(deleteTaskAC(idTodo, idTask))
     }
     const addTaskApp = (idTodo: string, newTitle: string) => {
-        let newTask = {id: v1(), title: newTitle, isDone: false}
-        setTasks({...tasks, [idTodo]: [newTask, ...tasks[idTodo]]})
+        dispatchTasks(addTaskAC(idTodo, newTitle))
     }
     const changeStatusTask = (idTodo: string, idTask: string, check: boolean) => {
-        setTasks({...tasks, [idTodo]: tasks[idTodo].map(el => el.id === idTask ? {...el, isDone: check} : el)})
-    }
-    const changeFilterTodo = (idTodo: string, filter: FilterType) => {
-        setTodoLists(todoLists.map(el => el.id === idTodo ? {...el, filter} : el))
-    }
-    const removeTodoApp = (idTodo: string) => {
-        setTodoLists(todoLists.filter(el => el.id !== idTodo))
-    }
-    const addTodo = (newTitle: string) => {
-        let idTodo = v1()
-        setTodoLists([{id: idTodo, title: newTitle, filter: 'All'}, ...todoLists])
-        setTasks({[idTodo]: [], ...tasks})
-    }
-    const updateTitleTodoApp = (idTodo: string, title: string) => {
-        setTodoLists(todoLists.map(el => el.id === idTodo ? {...el, title} : el))
+        dispatchTasks(changeTaskStatusAC(idTodo, idTask, check))
     }
     const updateTitleTaskApp = (idTodo: string, idTask: string, title: string) => {
-        setTasks({...tasks, [idTodo]: tasks[idTodo].map(el => el.id === idTask ? {...el, title} : el)})
+        dispatchTasks(updateTaskTitleAC(idTodo, idTask, title))
+    }
+    const changeFilterTodo = (idTodo: string, filter: FilterType) => {
+        dispatchTodoLists(changeFilterTodoListAC(idTodo, filter))
+    }
+
+    const updateTitleTodoApp = (idTodo: string, title: string) => {
+        dispatchTodoLists(updateTitleTodoListAC(idTodo, title))
+    }
+    const removeTodoApp = (idTodo: string) => {
+        dispatchTodoLists(removeTodoListAC(idTodo))
+        dispatchTasks(removeTodoListAC(idTodo))
+    }
+    const addTodo = (newTitle: string) => {
+        //we must form similar object
+        let action = addTodoListAC(newTitle)
+        //and now we have one object which we sent to the useReducer
+        dispatchTodoLists(action)
+        dispatchTasks(action)
     }
     return (
         <div className={cl.App}>

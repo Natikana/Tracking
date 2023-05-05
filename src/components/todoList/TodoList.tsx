@@ -22,7 +22,12 @@ export type TasksType = {
     updateTitleTodo: (idTodo: string, title: string) => void
     removeTodo: (idTodo: string) => void
 }
-export type FilterType = 'All' | 'Active' | 'Completed'
+export enum FilterType {
+    all='All',
+    active='Active',
+    completed='Completed'
+}
+
 export const styleBtn = {
     maxWidth: '38px',
     maxHeight: '38px',
@@ -87,11 +92,11 @@ export const TodoList = (props: TasksType) => {
             </ul>
             <div>
                 <Button size={'small'} variant={props.filter === 'All' ? 'contained' : 'outlined'}
-                        onClick={() => statusTasks('All')}>All</Button>
+                        onClick={() => statusTasks(FilterType.all)}>All</Button>
                 <Button size={'small'} variant={props.filter === 'Active' ? 'contained' : 'outlined'}
-                        onClick={() => statusTasks('Active')}>Active</Button>
+                        onClick={() => statusTasks(FilterType.active)}>Active</Button>
                 <Button size={'small'} variant={props.filter === 'Completed' ? 'contained' : 'outlined'}
-                        onClick={() => statusTasks('Completed')}>Completed</Button>
+                        onClick={() => statusTasks(FilterType.completed)}>Completed</Button>
             </div>
         </div>
     )
